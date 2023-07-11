@@ -1,6 +1,11 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from itertools import combinations
+from scipy.stats import pearsonr
+
+
+
 
 houston1 = pd.read_csv("RPCSV/CSVTables/Houston/Houston1.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
 houston2 = pd.read_csv("RPCSV/CSVTables/Houston/Houston2.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
@@ -116,7 +121,7 @@ print(col)
 '''
 
 
-
+#arrays for all the cities
 p1arr =np.array(p1value)
 p2arr =np.array(p2value)
 p3arr =np.array(p3value)
@@ -134,14 +139,139 @@ d2arr=np.array(d2value)
 d3arr=np.array(d3value)
 d4arr=np.array(d4value)
 d5arr=np.array(d5value)
+
+
+
+
 print(p1arr)
-tractArr= [p1arr,p2arr,p3arr,p4arr,p5arr,h1arr,h2arr,h3arr,h4arr,h5arr,d1arr,d2arr,d3arr,d4arr,d5arr]
+#creates array that holds all the different tracts and factors in one table
+tractArr=np.array([p1value,p2value,p3value,p4value,p5value,h1value,h2value,h3value,h4value,h5value,d1value,d2value,d3value,d4value,d5value])
 
-#plt.plot([p1arr[0],p2arr[0],p3arr[0],p4arr[0],p5arr[0]], [p1arr[1],p2arr[1],p3arr[1],p4arr[1],p5arr[1]],'ro')
-#plt.axis([0, 20, 0, 70])
-#plt.ylim([0,60])
-#plt.xlim([0,20])
+
+#creates pretty data frame for that table
+tractdf = pd.DataFrame(tractArr, columns = ['Factor 1','Factor 2','Factor 3','Factor 4','Factor 5',
+                                            'Factor 6','Factor 7','Factor 8','Factor 9','Factor 10',
+                                            'Factor 11','Factor 12','Factor 13','Factor 14','Factor 15',
+                                            'Factor 16','Factor 17','Factor 18','Factor 19','Factor 20',])
+
+tractdf['Factor 14'] = tractdf['Factor 14'].str.rstrip("%").astype(float)/100
+tractdf['Factor 15'] = tractdf['Factor 15'].str.rstrip("%").astype(float)/100
+tractdf['Factor 16'] = tractdf['Factor 16'].str.rstrip("%").astype(float)/100
+tractdf['Factor 17'] = tractdf['Factor 17'].str.rstrip("%").astype(float)/100
+tractdf['Factor 18'] = tractdf['Factor 18'].str.rstrip("%").astype(float)/100
+tractdf['Factor 19'] = tractdf['Factor 19'].str.rstrip("%").astype(float)/100
+tractdf['Factor 20'] = tractdf['Factor 20'].str.rstrip("%").astype(float)/100
+
+
+print("TRACTDF")
+print(tractdf)
+#Enviormental Factors
+factor1 = np.array(tractdf['Factor 1'],dtype=float)
+factor2 = np.array(tractdf['Factor 2'],dtype=float)
+factor3 = np.array(tractdf['Factor 3'],dtype=float)
+factor4 = np.array(tractdf['Factor 4'],dtype=float)
+factor5 = np.array(tractdf['Factor 5'],dtype=float)
+factor6 = np.array(tractdf['Factor 6'],dtype=float)
+factor7 = np.array(tractdf['Factor 7'],dtype=float)
+factor8 = np.array(tractdf['Factor 8'],dtype=float)
+factor9 = np.array(tractdf['Factor 9'],dtype=float)
+factor10 = np.array(tractdf['Factor 10'],dtype=float)
+factor11 = np.array(tractdf['Factor 11'],dtype=float)
+factor12 = np.array(tractdf['Factor 12'],dtype=float)
+factor13 = np.array(tractdf['Factor 13'],dtype=float)
+
+#these ones are the percent and thus the Demographic Factors
+factor14 = np.array(tractdf['Factor 14'],dtype=float)
+factor15 = np.array(tractdf['Factor 15'],dtype=float)
+factor16 = np.array(tractdf['Factor 16'],dtype=float)
+factor17 = np.array(tractdf['Factor 17'],dtype=float)
+factor18 = np.array(tractdf['Factor 18'],dtype=float)
+factor19 = np.array(tractdf['Factor 19'],dtype=float)
+factor20 = np.array(tractdf['Factor 20'],dtype=float)
+
+factorArr = np.array([factor1,factor2,factor3,factor4,factor5,factor6,factor7,factor8,factor9,factor10,factor11,factor12,factor13,factor14,factor15,factor16,factor17,factor18,factor19,factor20])
+#stores only the enviormental factor data
+enviormentalFactorArr = np.array([factor1,factor2,factor3,factor4,factor5,factor6,factor7,factor8,factor9,factor10,factor11,factor12,factor13,])
+#stores only the demographic data
+demographicFactorArr = np.array([factor14,factor15,factor16,factor17,factor18,factor19,factor20])
+
+#playing with plotting
+x=factor1
+y=factor16
+plt.plot(x,y,'ro')
 #plt.show()
+#################################
 
-plt.plot([tractArr[0]],[tractArr[1]])
-plt.show()
+
+
+#correlationResults = []
+pearsonCorrelationResults = []
+
+#combinations between the two sets #the number of combinations between the 2 sets is 91
+#arrCombinations = []
+efactor=[]#holds the corresponding peice of the combo with dfactor for the 92 different combos(just an int)
+dfactor=[]#holds the corresponding peice of the combo with dfactor for the 92 different combos(just an int)
+for i in range(0,13):
+    for j in range(0,7):#adds all combinations to the lists to be used to find r later
+        efactor.append(i)
+        dfactor.append(j)
+        #print(i,',',j)
+
+
+
+#gets r for all combinations and prints
+for i in range(0,91):
+    
+    x=efactor[i]
+    y=dfactor[i]
+    p,_=pearsonr(enviormentalFactorArr[x],demographicFactorArr[y])
+    pearsonCorrelationResults.append(p)
+    print(i,': ',x,',',y,':',p)
+    print('Pearsons correlation: %.3f' % p)
+
+print(pearsonCorrelationResults)
+print(enviormentalFactorArr)
+#need to make a table of the data and the corresponding factors to coefficients and stuff
+#df['column_name']=pd.Series(arr)
+
+
+correlationdf = pd.DataFrame(columns=(['e#','d#','r']))
+correlationdf['e#']=pd.Series(efactor)
+correlationdf['d#']=pd.Series(dfactor)
+correlationdf['r']=pd.Series(pearsonCorrelationResults)
+
+print(correlationdf)
+print(variablesCol)
+variables = np.array(variablesCol)
+efactorName= []
+dfactorName= []
+
+for i in range(0,13):
+    efactorName.append(variables[i])
+    print(i)
+
+for i in range(0,7):
+    dfactorName.append(variables[13+i])
+    print(i)
+
+print(efactorName)
+print(dfactorName)
+
+efactorNameFinal = []
+dfactorNameFinal = []
+
+for i in range(0,90):
+    efactorNameFinal.append(efactorName[efactor[i]])
+    dfactorNameFinal.append(dfactorName[dfactor[i]])
+
+
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows',None)
+#pd.set_option('display.max_rowwidth',None)
+pd.set_option('display.width', None)
+pd.set_option('display.max_colwidth', None)
+correlationdf = pd.DataFrame(columns=(['Enviormental Factor','Demographic Factor','r']))
+correlationdf['Enviormental Factor']=pd.Series(efactorNameFinal)
+correlationdf['Demographic Factor']=pd.Series(dfactorNameFinal)
+correlationdf['r']=pd.Series(pearsonCorrelationResults)
+print(correlationdf)
