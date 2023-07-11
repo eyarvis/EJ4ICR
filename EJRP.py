@@ -3,31 +3,68 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import combinations
 from scipy.stats import pearsonr
+import sys
+import seaborn as sns
+
+cities = ['Houston', 'Detroit', 'Portland']
+datasets = ['1', '2', '3', '4', '5']#in string form
+newDataSets = [ 1, 2, 3, 4, 5]#in num form
+
+# Create a dictionary to store the data
+data = {}#this is where all the cities data will be stored
+valueData={}#this is where the value column for all the cities data will be stored
+# Loop through cities and datasets
+for city in cities:#this defines data and makes it useable
+    city_data = []
+    for dataset in datasets:
+        file_path = f"RPCSV/CSVTables/{city}/{city}{dataset}.csv"
+        df = pd.read_csv(file_path, header=1, index_col=0, skiprows=[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49])
+        city_data.append(df)
+    data[city] = city_data
+
+    #print("HERE")
+    #print(data)
+
+
+for city in cities:#this defines valueData and makes it useable as an array of the cities "Value" values
+    tractData = []
+    for i in newDataSets:
+        var = (data[city][i-1])["Value"]
+        toAppend = np.array(var)
+        tractData.append(toAppend)
+    valueData[city]=tractData
 
 
 
 
-houston1 = pd.read_csv("RPCSV/CSVTables/Houston/Houston1.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-houston2 = pd.read_csv("RPCSV/CSVTables/Houston/Houston2.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-houston3 = pd.read_csv("RPCSV/CSVTables/Houston/Houston3.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-houston4 = pd.read_csv("RPCSV/CSVTables/Houston/Houston4.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-houston5 = pd.read_csv("RPCSV/CSVTables/Houston/Houston5.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
+'''''#old way of doing something
+houston1 = data['Houston'][0]
+houston2 = data['Houston'][1]
+houston3 = data['Houston'][2]
+houston4 = data['Houston'][3]
+houston5 = data['Houston'][4]
 
-detroit1 = pd.read_csv("RPCSV/CSVTables/Detroit/Detroit1.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-detroit2 = pd.read_csv("RPCSV/CSVTables/Detroit/Detroit2.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-detroit3 = pd.read_csv("RPCSV/CSVTables/Detroit/Detroit3.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-detroit4 = pd.read_csv("RPCSV/CSVTables/Detroit/Detroit4.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-detroit5 = pd.read_csv("RPCSV/CSVTables/Detroit/Detroit5.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
+portland1 = data['Portland'][0]
+portland2 = data['Portland'][1]
+portland3 = data['Portland'][2]
+portland4 = data['Portland'][3]
+portland5 = data['Portland'][4]
 
-portland1 = pd.read_csv("RPCSV/CSVTables/Portland/Portland1.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-portland2 = pd.read_csv("RPCSV/CSVTables/Portland/Portland2.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-portland3 = pd.read_csv("RPCSV/CSVTables/Portland/Portland3.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-portland4 = pd.read_csv("RPCSV/CSVTables/Portland/Portland4.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
-portland5 = pd.read_csv("RPCSV/CSVTables/Portland/Portland5.csv",header=1,index_col=0,skiprows=[2,3,4,5,6,7,8,9,10,11,12,13,14,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49])
+detroit1 = data['Detroit'][0]
+detroit2 = data['Detroit'][1]
+detroit3 = data['Detroit'][2]
+detroit4 = data['Detroit'][3]
+detroit5 = data['Detroit'][4]
+'''
 
-factorsCol = portland5["Category"]
-variablesCol=portland5["Selected Variables"]
 
+
+test = data['Portland'][4]
+factorsCol = test["Category"]
+variablesCol = test["Selected Variables"]
+
+
+''''#tract names
 p1Tract= "41051009204"
 p2Tract= "41051010602"
 p3Tract= "41051007400"
@@ -45,9 +82,10 @@ d2Tract= "26163512800"
 d3Tract= "26163531800"
 d4Tract= "26163501500"
 d5Tract= "26163535000"
+'''
 
-
-p1value = portland1["Value"]
+'''''#old p1value declaration
+p1value = (data['Portland'][0])["Value"]
 p2value = portland2["Value"]
 p3value = portland3["Value"]
 p4value = portland4["Value"]
@@ -64,14 +102,15 @@ d2value = detroit2["Value"]
 d3value = detroit3["Value"]
 d4value = detroit4["Value"]
 d5value = detroit5["Value"]
+'''
 
-
-
+'''#old table
 table = {"Factors":factorsCol,"Variables":variablesCol,"P1":p1value,"P2":p2value,"P3":p3value,"P4":p4value,"P5":p5value,
          "H1":h1value,"H2":h2value,"H3":h3value,"H4":h4value,"H5":h5value,
          "D1":d1value,"D2":d2value,"D3":d3value,"D4":d4value,"d5":d5value}
 table = pd.DataFrame(table)
 print(table)
+'''
 
 '''Print table with tract names
 tableTract = {"Factors":factorsCol,"Variables":variablesCol,
@@ -121,7 +160,7 @@ print(col)
 '''
 
 
-#arrays for all the cities
+'''old arrays for all the cities
 p1arr =np.array(p1value)
 p2arr =np.array(p2value)
 p3arr =np.array(p3value)
@@ -139,14 +178,20 @@ d2arr=np.array(d2value)
 d3arr=np.array(d3value)
 d4arr=np.array(d4value)
 d5arr=np.array(d5value)
+'''
 
 
 
-
-print(p1arr)
 #creates array that holds all the different tracts and factors in one table
-tractArr=np.array([p1value,p2value,p3value,p4value,p5value,h1value,h2value,h3value,h4value,h5value,d1value,d2value,d3value,d4value,d5value])
+###tractArr=np.array([p1value,p2value,p3value,p4value,p5value,h1value,h2value,h3value,h4value,h5value,d1value,d2value,d3value,d4value,d5value])
+arr=[]
+for city in cities:
+    for i in newDataSets:
+        arr.append(valueData[city][i-1])
 
+tractArr=np.array(arr)
+print("HELOOLOLO")
+print(tractArr)
 
 #creates pretty data frame for that table
 tractdf = pd.DataFrame(tractArr, columns = ['Factor 1','Factor 2','Factor 3','Factor 4','Factor 5',
@@ -154,17 +199,15 @@ tractdf = pd.DataFrame(tractArr, columns = ['Factor 1','Factor 2','Factor 3','Fa
                                             'Factor 11','Factor 12','Factor 13','Factor 14','Factor 15',
                                             'Factor 16','Factor 17','Factor 18','Factor 19','Factor 20',])
 
-tractdf['Factor 14'] = tractdf['Factor 14'].str.rstrip("%").astype(float)/100
-tractdf['Factor 15'] = tractdf['Factor 15'].str.rstrip("%").astype(float)/100
-tractdf['Factor 16'] = tractdf['Factor 16'].str.rstrip("%").astype(float)/100
-tractdf['Factor 17'] = tractdf['Factor 17'].str.rstrip("%").astype(float)/100
-tractdf['Factor 18'] = tractdf['Factor 18'].str.rstrip("%").astype(float)/100
-tractdf['Factor 19'] = tractdf['Factor 19'].str.rstrip("%").astype(float)/100
-tractdf['Factor 20'] = tractdf['Factor 20'].str.rstrip("%").astype(float)/100
+dFactorDict = ['Factor 14','Factor 15','Factor 16','Factor 17','Factor 18','Factor 19','Factor 20']
+for d in dFactorDict:#gets rid of the percentages and changes percent in dfactors to decimals
+    tractdf[d]=tractdf[d].str.rstrip("%").astype(float)/100
 
 
 print("TRACTDF")
 print(tractdf)
+
+
 #Enviormental Factors
 factor1 = np.array(tractdf['Factor 1'],dtype=float)
 factor2 = np.array(tractdf['Factor 2'],dtype=float)
@@ -195,24 +238,24 @@ enviormentalFactorArr = np.array([factor1,factor2,factor3,factor4,factor5,factor
 #stores only the demographic data
 demographicFactorArr = np.array([factor14,factor15,factor16,factor17,factor18,factor19,factor20])
 
-#playing with plotting
+'''#playing with plotting
 x=factor1
 y=factor16
 plt.plot(x,y,'ro')
 #plt.show()
-#################################
+'''#################################
 
 
 
-#correlationResults = []
 pearsonCorrelationResults = []
 
 #combinations between the two sets #the number of combinations between the 2 sets is 91
-#arrCombinations = []
-efactor=[]#holds the corresponding peice of the combo with dfactor for the 92 different combos(just an int)
-dfactor=[]#holds the corresponding peice of the combo with dfactor for the 92 different combos(just an int)
-for i in range(0,13):
-    for j in range(0,7):#adds all combinations to the lists to be used to find r later
+
+#when paired efactor and dfactor hold the correspondindg pairs of combinations
+efactor=[]#holds the index of the factor data set in enviormentalFactoArr 
+dfactor=[]#holds the index of the factor data set in demographicFactoArr
+for i in range(0,13):#adds all combinations to the lists to be used to find r later
+    for j in range(0,7):
         efactor.append(i)
         dfactor.append(j)
         #print(i,',',j)
@@ -226,22 +269,22 @@ for i in range(0,91):
     y=dfactor[i]
     p,_=pearsonr(enviormentalFactorArr[x],demographicFactorArr[y])
     pearsonCorrelationResults.append(p)
-    print(i,': ',x,',',y,':',p)
-    print('Pearsons correlation: %.3f' % p)
+    #print(i,': ',x,',',y,':',p)
+    #print('Pearsons correlation: %.3f' % p)
 
-print(pearsonCorrelationResults)
-print(enviormentalFactorArr)
+#print(pearsonCorrelationResults)
+#print(enviormentalFactorArr)
 #need to make a table of the data and the corresponding factors to coefficients and stuff
 #df['column_name']=pd.Series(arr)
 
-
+#creates the df to display all the r values 
 correlationdf = pd.DataFrame(columns=(['e#','d#','r']))
 correlationdf['e#']=pd.Series(efactor)
 correlationdf['d#']=pd.Series(dfactor)
 correlationdf['r']=pd.Series(pearsonCorrelationResults)
 
-print(correlationdf)
-print(variablesCol)
+#print(correlationdf)
+#print(variablesCol)
 variables = np.array(variablesCol)
 efactorName= []
 dfactorName= []
@@ -254,13 +297,11 @@ for i in range(0,7):
     dfactorName.append(variables[13+i])
     print(i)
 
-print(efactorName)
-print(dfactorName)
 
 efactorNameFinal = []
 dfactorNameFinal = []
 
-for i in range(0,90):
+for i in range(0,91):
     efactorNameFinal.append(efactorName[efactor[i]])
     dfactorNameFinal.append(dfactorName[dfactor[i]])
 
@@ -270,8 +311,14 @@ pd.set_option('display.max_rows',None)
 #pd.set_option('display.max_rowwidth',None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
-correlationdf = pd.DataFrame(columns=(['Enviormental Factor','Demographic Factor','r']))
+
+#creating new df to display correlation stuff
+correlationdf = pd.DataFrame(columns=(['E#','Enviormental Factor','D#','Demographic Factor','r']))
+correlationdf['E#']=pd.Series(efactor)
+correlationdf['D#']=pd.Series(dfactor)
 correlationdf['Enviormental Factor']=pd.Series(efactorNameFinal)
 correlationdf['Demographic Factor']=pd.Series(dfactorNameFinal)
 correlationdf['r']=pd.Series(pearsonCorrelationResults)
 print(correlationdf)
+
+#Creating new df to display correlation stuff in matrix form
