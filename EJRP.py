@@ -215,9 +215,9 @@ corrFactorAll = tractdf.corr()#also a perfectly good representation of the corre
 #print(corrFactor)
 #plot all individual cities
 
-#dataplot = sb.heatmap(corrFactorAll,annot=True,linewidths=0.5, linecolor='white')
+dataplot = sb.heatmap(corrFactorAll,annot=True,linewidths=0.5, linecolor='white')
 
-#plt.show()
+plt.show()
 
 
 
@@ -338,5 +338,5 @@ sb.heatmap(portland.corr(),ax=ax[0])
 sb.heatmap(Houston.corr(),ax=ax[1])
 sb.heatmap(Detroit.corr(),ax=ax[2])
 '''
-plt.margins(x=0)
+#plt.margins(x=0)
 plt.show()
