@@ -17,6 +17,31 @@ def corrPlot(corrdf):#function to plot correlation heatmaps
     sb.heatmap(plot)
     plt.show()
 
+def plotForState(stateName,stateIndex):#this will print a heatmap for a given state
+    totalDataPoints = len(stateIndex[stateName])
+    newColArr = []
+
+    for j in range(0,19):
+        newArr = []
+        currentFactor = colArr[j]
+        for i in range(0,totalDataPoints):
+            newArr.append(currentFactor[i])
+        newColArr.append(newArr)
+
+    testdf = pd.DataFrame(newColArr)
+    print(testdf)
+
+
+    testdf = testdf.transpose()
+    print(testdf)
+    testdf = testdf.corr()
+    print(testdf)
+
+    g =sb.heatmap(testdf)
+    g.set(xlabel = stateName)
+    plt.show()
+
+
 
 df = pd.read_csv('RPCSV/CSVTables/totalTracts.csv')#this is the file that holds all of the tracts
 
@@ -78,16 +103,16 @@ for i in range(0,totalTractCount):
 
     totalCount=totalCount+1
 
-print("THIS")
-print(stateIndex['Alabama'])
-print("OH")
-print(stateTract['Alabama'])
-
-print(stateTract['Alabama'][0])
-print(stateIndex['Alabama'][0])
-
 
 #making a heatmap for alabama to test before writting function
+plotForState('Alabama',stateIndex)
+
+''''#this will print all the heatmaps for all the states
+for state in states:
+    plotForState(state,stateIndex)
+''''
+
+''''#this is old test code
 totalAlabama= len(stateIndex['Alabama'])
 print(totalAlabama)
 print(len(colArr))
@@ -110,4 +135,5 @@ print(testdf)
 
 sb.heatmap(testdf)
 plt.show()
+'''
 ##########################################################################
