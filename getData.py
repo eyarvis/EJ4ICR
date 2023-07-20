@@ -1,12 +1,15 @@
 import pandas as pd
 import seaborn as sb
 import matplotlib.pyplot as plt
+import numpy as np
+import geopandas as gpd
+
 from pylab import savefig
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows',None)
 #pd.set_option('display.max_rowwidth',None)
-#pd.set_option('display.width', None)
+pd.set_option('display.width', None)
 #pd.set_option('display.max_colwidth', None)
 def plot(corrdf):#Function to plot heatmaps
     sb.heatmap(corrdf)
@@ -49,7 +52,36 @@ def plotForState(stateName,stateIndex,colArr):#this will print a heatmap for a g
     plt.show()
 
 
-def graphFactorsPerState(stateName,stateIndex,colArr):
+def getCorrelationForState(stateName,stateIndex,colArr):#this will print a heatmap for a given state
+    totalDataPoints = len(stateIndex[stateName])
+    dataStart = stateIndex[stateName][0]
+    print("DATA START",dataStart)
+   
+    dataEnd = stateIndex[stateName][totalDataPoints-1]
+    print("DATA END", dataEnd)
+    newColArr = []
+
+    for j in range(0,20):
+        newArr = []
+        currentFactor = colArr[j]
+        for i in range(dataStart,(dataEnd+1)):
+            newArr.append(currentFactor[i])
+        newColArr.append(newArr)
+
+    testdf = pd.DataFrame(newColArr)
+
+    Tdf = testdf.transpose()
+    
+    
+    print("TESTDF TO COMPARE")
+    print(Tdf[0])
+    finaldf = Tdf.corr()
+    print(finaldf)
+
+    return finaldf
+
+
+def graphFactorsPerState(stateName,stateIndex,colArr):#graphs the correlation of factors for a given state
     totalDataPoints = len(stateIndex[stateName])    
     dataStart = stateIndex[stateName][0]
     dataEnd = stateIndex[stateName][totalDataPoints-1]
@@ -71,11 +103,34 @@ def graphFactorsPerState(stateName,stateIndex,colArr):
             plt.savefig(f"correlationGraphs/byState2/{stateName}.{tableLabels[i]}VS{tableLabels[j]}.png")
             plt.show()
 
+def findMax(numOfMax,arr):#finds the max values in a data set and returns their index as well
+    finalMaxPrint = []
+    finalMaxIndexPrint = []
+   
+    manipulatedArr = arr
+    print(manipulatedArr)
+    for i in range(0,numOfMax):
+        totalItems = len(manipulatedArr)
+        currentMax=0
+        maxIndex = -1
+        for j in range(0,totalItems):
+            if currentMax<manipulatedArr[j]:
+                currentMax = manipulatedArr[j]
+                maxIndex = j
+                
+        finalMaxPrint.append(currentMax)
+        finalMaxIndexPrint.append(maxIndex)
+        manipulatedArr[maxIndex] = 0
+
+    print("FINAL MAX")
+    print(finalMaxPrint)
+    print(finalMaxIndexPrint)
 
 df = pd.read_csv('RPCSV/CSVTables/totalTracts2.csv')#this is the file that holds all of the tracts
 
 
 #these arrays hold the lists of factors
+printLabel = ['PM-2.5','Ozone(ppb)','Diesel-PM','Cancer-Risk','Resp-Hazard Index']
 eLabel = ['PM 2.5','Ozone(ppb)','Diesel PM (ug/m3)','Cancer Risk','Resp. Hazard Index','Toxic Releases To Air','Traffic(prox. & vol.)',
           'Lead Paint Indicator','Superfund Prox.','RMP Prox.','Hazardous Waste Prox.','Underground Storage Tank Indicator','Waste Water Discharge Indicator']
 dLabel =['Demo. Index','Supp. Demo. Index ','POC Pop.','Low Income Pop.','Unemployed','Low English Household','Pop. w/ < HS Ed.']
@@ -93,7 +148,24 @@ states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas',
           'Rhode Island', 'South Carolina', 'South Dakota', 
           'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 
           'Washington', 'West Virginia', 'Wisconsin', 'Wyoming']
-states2 = [ 'West Virginia', 'Wisconsin', 'Wyoming']
+states2 = [ 'Alabama', 'Arizona', 'Arkansas', 
+          'California', 'Colorado', 'Connecticut', 
+          'Delaware', 'District of Columbia', 'Florida', 'Georgia', 
+           'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 
+          'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 
+          'Minnesota',  'Mississippi', 'Missouri', 
+          'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 
+          'New Mexico', 'New York', 'North Carolina', 'North Dakota', 
+          'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 
+          'Rhode Island', 'South Carolina', 'South Dakota', 
+          'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 
+          'Washington', 'West Virginia', 'Wisconsin', 'Wyoming']
+orderedStates = ['West Virginia',  'Florida' , 'Illinois' ,'Minnesota' , 'Maryland' ,'Rhode Island', 'Idaho' ,'New Hampshire',  
+                 'North Carolina', 'Vermont',  'Connecticut' , 'Delaware' , 'New Mexico',  'California',  'New Jersey' , 'Wisconsin' ,
+                'Oregon',  'Nebraska' , 'Pennsylvania',    'Washington' ,  'Louisiana' ,  'Georgia' ,   'Alabama',    'Utah',  'Ohio',  
+                'Texas',   'Colorado',   'South Carolina',    'Oklahoma',  'Tennessee',   'Wyoming','North Dakota' , 'Kentucky' ,  
+                'Maine',  'New York',  'Nevada'  , 'Michigan',   'Arkansas',   'Mississippi' , 'Missouri',  'Montana',   'Kansas' ,  
+                'Indiana',  'South Dakota'  , 'Massachusetts'  , 'Virginia',  'District of Columbia' , 'Iowa' , 'Arizona'  ]
 stateTract={}#hold state name and all corresponding tracts
 stateIndex={}#holds state names and all correspondindg row index of data
 stateCounty = {}#holds all the state names and all the correspondng countys
@@ -128,7 +200,7 @@ for state in states:#createsa bunch of arrays to index stuff for the dicts
     stateTract[state] = stateArr
     stateCounty[state] = countyArr
 
-for i in range(0,totalTractCount):#creates the dicts to hold tract and ocunty info
+for i in range(0,totalTractCount):#creates the dicts to hold tract and county info so functions work
     for state in states:
         if stateCol[i] == state:
             tract = tractCol[i]
@@ -139,12 +211,124 @@ for i in range(0,totalTractCount):#creates the dicts to hold tract and ocunty in
 
     totalCount=totalCount+1
 
-for state in states2:
-    graphFactorsPerState(state,stateIndex,colArr)
+correlationOne = []
+correlationTwo = []
+correlationThree = []
+correlationFour = []
+correlationFive = []
 
-#print("2")
-#print(corrdf[tableLabels[2]])
-#print("9")
-#print(corrdf[tableLabels[8]])
 
-#def findMax(numOfMax,arr,)
+for state in orderedStates:
+    stateCorrDf = getCorrelationForState(state,stateIndex,colArr)
+
+    correlationOne.append(stateCorrDf[13][0])
+    correlationTwo.append(stateCorrDf[13][1])
+    correlationThree.append(stateCorrDf[13][2])
+    correlationFour.append(stateCorrDf[13][3])
+    correlationFive.append(stateCorrDf[13][4])
+
+corOneCol=pd.Series(correlationOne)
+corTwoCol=pd.Series(correlationTwo)
+corThreeCol=pd.Series(correlationThree)
+corFourCol=pd.Series(correlationFour)
+corFiveCol=pd.Series(correlationFive)
+
+
+dfdf = pd.DataFrame(columns = ['One','Two','Three','Four','Five'])
+dfdf['One']=corOneCol
+dfdf['Two']=corTwoCol
+dfdf['Three']=corThreeCol
+dfdf['Four']=corFourCol
+dfdf['Five']=corFiveCol
+
+
+
+
+
+
+
+
+
+
+
+
+##############################################################################################################################
+#Doing the shape heatmaps
+
+
+#gets the shape file
+path = 'tl_2022_us_state/tl_2022_us_state.shp'
+newMap = gpd.read_file(path)
+
+#extracts the state and geometry columns since they are the only ones we need
+stateCol = pd.Series(newMap['NAME'])
+geometryCol = pd.Series(newMap['geometry'])
+
+
+#creating data frame for my new geopandas map
+
+deletedf = pd.DataFrame(columns = ['NAME','geometry'])
+
+deletedf['NAME'] = stateCol
+deletedf['geometry'] = geometryCol
+
+#finding the states we dont want and getting rid of them#######################
+index = 0
+arr = []
+arrName = []
+found = False
+for item in stateCol:#finding the ones to delete
+    found=False
+    for state in states2:
+        if item == state:
+            found = True
+    if found!=True :
+        arr.append(index)
+        arrName.append(item)
+
+    index = index+1
+for i in arrName:#deleting them
+    deletedf = deletedf.drop(deletedf[deletedf['NAME'] == f'{i}'].index)
+#####################################################################################
+
+stateCol = pd.Series(deletedf['NAME'])
+geometryCol = pd.Series(deletedf['geometry'])
+
+#deals with the weird dropping of certain index thing to make the table actually 48 long
+newarr = np.array(stateCol)
+stateCol = pd.Series(newarr)
+newarr = np.array(geometryCol)
+geometryCol = pd.Series(newarr)
+
+
+df = pd.DataFrame(columns=['NAME','geometry','One','Two','Three','Four','Five'])
+
+df['NAME'] = stateCol
+df['geometry'] = geometryCol
+
+factors = ['One','Two','Three','Four','Five']
+df['One']=corOneCol
+df['Two']=corTwoCol
+df['Three']=corThreeCol
+df['Four']=corFourCol
+df['Five']=corFiveCol
+
+
+
+
+
+#creating the final map
+thisMap = gpd.GeoDataFrame(df)
+print(thisMap)
+#thisMap.plot(figsize=(10,15))
+
+for i in range(0,5):
+    thisMap.plot(figsize=(10,15),column=f'{factors[i]}', legend=True)
+    plt.title(f"Demographic Index vs {eLabel[i]}")
+    
+    plt.savefig(f"heatMaps/USMaps/DemographicIndexVS{printLabel[i]}.png")
+    
+
+
+
+plt.show()
