@@ -1,0 +1,21 @@
+[0] Config.pm:307> INFO - This is Biber 2.17
+[0] Config.pm:310> INFO - Logfile is 'main.blg'
+[61] biber:340> INFO - === Fri Aug  4, 2023, 14:03:07
+[80] Biber.pm:418> INFO - Reading 'main.bcf'
+[122] Biber.pm:969> INFO - Using all citekeys in bib section 0
+[134] Biber.pm:4383> INFO - Processing section 0
+[144] Biber.pm:4574> INFO - Looking for bibtex file 'main.bib' for section 0
+[145] bibtex.pm:1713> INFO - LaTeX decoding ...
+[150] bibtex.pm:1518> INFO - Found BibTeX data source 'main.bib'
+[197] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[197] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[200] Biber.pm:4203> INFO - Sorting list 'nty/global//global/global' of type 'entry' with template 'nty' and locale 'en-US'
+[200] Biber.pm:4209> INFO - No sort tailoring available for locale 'en-US'
+[216] bbl.pm:654> INFO - Writing 'main.bbl' with encoding 'UTF-8'
+[221] bbl.pm:757> INFO - Output to main.bbl
+[221] Biber.pm:130> WARN - legacy month field 'Dec' in entry 'Binkovitz_2016' is not an integer - this will probably not sort properly.
+[222] Biber.pm:130> WARN - legacy month field 'Jan' in entry 'EPA_2023b' is not an integer - this will probably not sort properly.
+[222] Biber.pm:130> WARN - legacy month field 'Jul' in entry 'EPA_2023d' is not an integer - this will probably not sort properly.
+[222] Biber.pm:130> WARN - legacy month field 'Jan' in entry 'EPA_2023a' is not an integer - this will probably not sort properly.
+[222] Biber.pm:130> WARN - legacy month field 'Jun' in entry 'EPA_2023c' is not an integer - this will probably not sort properly.
+[222] Biber.pm:132> INFO - WARNINGS: 5
