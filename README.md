@@ -47,6 +47,10 @@ you may need to install python3 by running the following command in order for th
 
 ```sudo apt install python3```
 
+In order for the code to run smoothly you must download the full shape file from this website:
+https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2022&layergroup=Counties+%28and+equivalent%29
+and put it in the same folder as you download 'testShapeFile.py' to.
+
 
 
 ## Accessing Final Report and Final Presentation:

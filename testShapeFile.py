@@ -89,6 +89,6 @@ def getStateShapeFile():#creates shape files of all the states
         toUseDf.plot()
         plt.title(f'{state}')
         plt.show()
-        #toUseDf.to_file(f'statesShapeFile/{state}shapeFile.shp')#uncomment if you want to save the shape files
+        toUseDf.to_file(f'statesShapeFile/{state}shapeFile.shp')#uncomment if you want to save the shape files
 
 getStateShapeFile()

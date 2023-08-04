@@ -520,7 +520,9 @@ df['Five']=corFiveCol
 
 #plotForState('INSERT STATE NAME')
 
-graphFactorsPerState('Alabama')
+#graphFactors()
+
+#graphFactorsPerState('Alabama')
 
 #graphAvgFactor(INSERT_FACTOR_NUMBER)
 
