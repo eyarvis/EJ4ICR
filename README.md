@@ -12,11 +12,11 @@ The file EJRP.py contains my intital research and findings on the first 15 tract
 
 
 
-
+##Accessing Final Report and Final Presentation
 
 My final presentation slides and final research paper can be found in the folder FinalReport. My final slides are "EmilyYarvisSlides.odp". These slides can be opened with the following command:
 
-libreoffice --headless --convert-to pdf EmilyYarvisSlides.odp
+```libreoffice --headless --convert-to pdf EmilyYarvisSlides.odp```
 
 You may need to install libreoffice(a free and open scource version of google slides or powerpoint) in order for this to work. 
 
