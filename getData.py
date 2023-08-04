@@ -11,13 +11,14 @@ pd.set_option('display.max_rows',None)
 #pd.set_option('display.max_rowwidth',None)
 pd.set_option('display.width', None)
 #pd.set_option('display.max_colwidth', None)
-def plot(corrdf):#Function to plot heatmaps
+def plot(corrdf):#Function to plot heatmaps. pass in the data frame you would like to make a heatmpa of that has already been .corr()
     sb.heatmap(corrdf)
     plt.show()
 
-def corrPlot(corrdf):#function to plot correlation heatmaps
+def corrPlot(corrdf):#function to plot correlation heatmaps from a data frame that has not already been .corr()
     plot = corrdf.corr()
     sb.heatmap(plot)
+    plt.title("Correlation of All Tracts")
     plt.show()
 
 def plotForState(stateName,stateIndex,colArr):#this will print a heatmap for a given state
@@ -55,10 +56,10 @@ def plotForState(stateName,stateIndex,colArr):#this will print a heatmap for a g
 def getCorrelationForState(stateName,stateIndex,colArr):#this will print a heatmap for a given state
     totalDataPoints = len(stateIndex[stateName])
     dataStart = stateIndex[stateName][0]
-    print("DATA START",dataStart)
+    
    
     dataEnd = stateIndex[stateName][totalDataPoints-1]
-    print("DATA END", dataEnd)
+  
     newColArr = []
 
     for j in range(0,20):
@@ -70,15 +71,31 @@ def getCorrelationForState(stateName,stateIndex,colArr):#this will print a heatm
 
     testdf = pd.DataFrame(newColArr)
 
+    #print("HELLO HELLO HELLO")
     Tdf = testdf.transpose()
+    #print(Tdf)
     
     
-    print("TESTDF TO COMPARE")
-    print(Tdf[0])
+    
     finaldf = Tdf.corr()
-    print(finaldf)
-
     return finaldf
+
+
+def getCorrForAllTractsInState(stateName,stateIndex,colArr):
+    totalDataPoints = len(stateIndex[stateName])
+    dataStart = stateIndex[stateName][0]
+    
+   
+    dataEnd = stateIndex[stateName][totalDataPoints-1]
+  
+    newColArr = []
+
+    for j in range(0,20):
+        newArr = []
+        currentFactor = colArr[j]
+        for i in range(dataStart,(dataEnd+1)):
+            newArr.append(currentFactor[i])
+        newColArr.append(newArr)
 
 
 def graphFactorsPerState(stateName,stateIndex,colArr):#graphs the correlation of factors for a given state
@@ -126,11 +143,136 @@ def findMax(numOfMax,arr):#finds the max values in a data set and returns their 
     print(finalMaxPrint)
     print(finalMaxIndexPrint)
 
-df = pd.read_csv('RPCSV/CSVTables/totalTracts2.csv')#this is the file that holds all of the tracts
+def graphAvgFactor(stateCol,geoCol,avgArr,index):#makes a US heatmap of the average of a given factor
 
+    df = pd.DataFrame(columns = ['State','geometry','factoravg'])
+    df['State'] = stateCol
+    df['geometry'] = geoCol
+    df['factoravg'] = avgArr
+
+    print(df)
+    factorMap = gpd.GeoDataFrame(df)
+    print(factorMap)
+    factorMap.plot(figsize=(20,20),column='factoravg', legend=True,cmap = 'inferno')
+    plt.title(f"AVERAGE {printLabel[index]}")
+    
+    plt.show()
+
+
+
+
+def graphSpecificState(path,givenState):
+    state = gpd.read_file(path)#this is the states shapefile
+    
+    
+    gdf = gpd.GeoDataFrame(state)#gdf to match
+
+
+    nameCol = gdf['County']#makes a list for the counties
+    geoCol = gdf['geometry']#makes a list for the corresponding geometry
+    factorCol = []
+    
+    countyDict = {}#holds the data frames for each county
+    corrCountyDict = {}#holds the correlation data frames for each county
+
+    for county in simpleStateCounty[givenState]:#creates a data frame for every county in a given state and stores it in countyDict[county]
+        countyDF = pd.DataFrame()
+        arr = []
+        countyDict[county] = countyDF
+        corrCountyDict[county] = arr
+
+        
+
+    totalData = len(stateCountyIndex[givenState])#the len of the list so like how many counties there are
+    dataStart = stateIndex[givenState][0]#index of beginning of county
+    dataEnd = stateIndex[givenState][totalData-1]#index of end of county
+
+    for i in range(0,totalData-1):#makes a data frame of all of the different counties data and stores it in countyDict[county]
+        
+        dataStart = stateCountyIndex[givenState][i]
+        dataEnd = stateCountyIndex[givenState][i+1]
+        county = simpleStateCounty[givenState][i]
+        df = countyDict[county]
+
+        for j in range(0,20):
+            df[j] = colArr[j][dataStart:dataEnd]
+
+        
+    for county in simpleStateCounty[givenState]:#creates corrCountyDict[county]
+        corrCountyDict[county] = countyDict[county].corr()
+    
+    totalCounties = len(nameCol)
+
+    arrOne= np.empty(totalCounties)
+    arrTwo= np.empty(totalCounties)
+    arrThree = np.empty(totalCounties)
+    arrFour = np.empty(totalCounties)
+    arrFive = np.empty(totalCounties)
+
+    found = False
+    index=0
+    for county in nameCol:#creates the factor columns for the state
+        map = sb.heatmap(corrCountyDict[county])
+        map.plot()
+        plt.title(f"{county}")
+        plt.show()
+        found= False
+        for countyReal in simpleStateCounty[givenState]:
+            
+            if county == countyReal:
+                found = True
+                toAdd = countyReal
+
+        if found == True:
+            df = corrCountyDict[toAdd]
+            arrOne[index]=df[13][0]
+            arrTwo[index]=df[13][1]
+            arrThree[index]=df[13][2]
+            arrFour[index]=df[13][3]
+            arrFive[index]=df[13][4]
+        elif found ==False:
+            arrOne[index]=np.nan
+            arrTwo[index]=np.nan
+            arrThree[index]=np.nan
+            arrFour[index]=np.nan
+            arrFive[index]=np.nan
+
+        index = index+1
+   
+    
+    corrOneCol = pd.Series(arrOne)
+    corrTwoCol = pd.Series(arrTwo)
+    corrThreeCol = pd.Series(arrThree)
+    corrFourCol = pd.Series(arrFour)
+    corrFiveCol = pd.Series(arrFive)
+
+    factorArr = [corrOneCol,corrTwoCol,corrThreeCol,corrFourCol,corrFiveCol]
+    for i in range(0,5):
+            
+        df = pd.DataFrame(columns = ['NAME','geometry','FACTOR'])
+        df['NAME'] = nameCol
+        df['geometry'] = geoCol
+        df['FACTOR'] = factorArr[i]
+        print(df)
+        maps = gpd.GeoDataFrame(df)
+        
+        maps.plot(figsize=(20,20), column = 'FACTOR', legend=True,cmap = 'inferno',edgecolor = 'black',linewidth = 1)
+    
+        plt.title(f"{givenState}- Correlation Between Demographic Index and {eLabel[i]}")
+        plt.savefig(f"heatMaps/stateSpecific/{givenState}-{printLabel[i]}.png")
+        plt.show()
+        
+
+
+df = pd.read_csv('RPCSV/CSVTables/totalTracts2.csv')#this is the file that holds all of the tracts
+print('hello')
+df=df.fillna(0)
 
 #these arrays hold the lists of factors
-printLabel = ['PM-2.5','Ozone(ppb)','Diesel-PM','Cancer-Risk','Resp-Hazard Index']
+printLabel = ['PM-2.5','Ozone(ppb)','Diesel-PM','Cancer-Risk','Resp-Hazard Index','Toxic-Releases-To-Air','Traffic(prox.&vol.)',
+          'Lead-Paint-Indicator','Superfund-Prox.','RMP-Prox.','Hazardous-Waste-Prox.','Underground-Storage-Tank-Indicator',
+          'Waste-Water-Discharge-Indicator','Demo.-Index','Supp.-Demo.-Index ','POC-Pop.','Low-Income-Pop.','Unemployed','Low-English-Household','Pop.-w/-< HS Ed.']
+dLabel =['Demo. Index','Supp. Demo. Index ','POC Pop.','Low Income Pop.','Unemployed','Low English Household','Pop. w/ < HS Ed.']
 eLabel = ['PM 2.5','Ozone(ppb)','Diesel PM (ug/m3)','Cancer Risk','Resp. Hazard Index','Toxic Releases To Air','Traffic(prox. & vol.)',
           'Lead Paint Indicator','Superfund Prox.','RMP Prox.','Hazardous Waste Prox.','Underground Storage Tank Indicator','Waste Water Discharge Indicator']
 dLabel =['Demo. Index','Supp. Demo. Index ','POC Pop.','Low Income Pop.','Unemployed','Low English Household','Pop. w/ < HS Ed.']
@@ -170,16 +312,17 @@ stateTract={}#hold state name and all corresponding tracts
 stateIndex={}#holds state names and all correspondindg row index of data
 stateCounty = {}#holds all the state names and all the correspondng countys
 stateCountyIndex = {}
+simpleStateCounty = {}
 colArr = []#array of all the factors values from the tab;le
 index = 0
 for label in tableLabels:#creates an array of all the factors and excludes the state and tract stuff
     ls = df[label]
     colArr.append(ls)
 
-#Prints heatmap of every single different tract
+
 newDf = pd.DataFrame(colArr)
 corrdf = newDf.transpose()#this is the data frame that has the factors as the columns so it is ready to do .corr() on 
-#corrPlot(corrdf)
+corrPlot(corrdf)
 
 
 
@@ -195,10 +338,16 @@ for state in states:#createsa bunch of arrays to index stuff for the dicts
     stateArr= []
     indexArr = []
     countyArr = []
+    simpleCountyArr = []
     countyIndexArr = []
-    stateIndex[state]=indexArr
-    stateTract[state] = stateArr
-    stateCounty[state] = countyArr
+    CountyIndex = []
+    stateIndex[state]=indexArr#has a list of all the indexes of every tract in a given state
+    stateTract[state] = stateArr#has a list of all the tracts in every state
+    stateCounty[state] = countyArr#has a list of all the counties(repeated) in every state by tract
+    stateCountyIndex[state] = CountyIndex#has a list of the index of every new county
+    simpleStateCounty[state]= simpleCountyArr#has a list of all the counties(never repeated) per state
+    
+
 
 for i in range(0,totalTractCount):#creates the dicts to hold tract and county info so functions work
     for state in states:
@@ -208,8 +357,63 @@ for i in range(0,totalTractCount):#creates the dicts to hold tract and county in
             stateIndex[state].append(i)
             stateTract[state].append(tract)
             stateCounty[state].append(county)
+            
+            countyIndex = len(stateCounty[state])
+           
+            if stateCounty[state][countyIndex-2] != county or countyIndex == 1:
+                simpleStateCounty[state].append(county)
+                stateCountyIndex[state].append(i)
+
 
     totalCount=totalCount+1
+
+
+total = 0
+
+
+
+for state in states:
+    value =len(stateCounty[state])
+    total = value+total
+    stateCountyIndex[state].append(total)
+
+
+
+
+
+
+####################################################################testcode#####################
+
+factorAvgDict = {} #creates a dict that holds each factor and then what the average is of that factor for every state
+
+for j in range(0,20):#creates a dict that holds all the different factors and a corresponding arrays with the averages for those factors of every state
+    avgArr = []
+    
+    for state in orderedStates:
+        totalData = len(stateIndex[state])
+        dataStart = stateIndex[state][j]
+        dataEnd = stateIndex[state][totalData-1]
+        sum =0
+        avg = 0
+        for i in range(dataStart,(dataEnd+1)):
+            sum = sum+colArr[j][i]
+        
+        avg = sum / totalData
+        avgArr.append(avg)
+    factorAvgDict[printLabel[j]] = avgArr
+        
+
+
+
+
+
+
+
+
+
+
+
+###################################to create geoMaps########################################
 
 correlationOne = []
 correlationTwo = []
@@ -242,16 +446,6 @@ dfdf['Four']=corFourCol
 dfdf['Five']=corFiveCol
 
 
-
-
-
-
-
-
-
-
-
-
 ##############################################################################################################################
 #Doing the shape heatmaps
 
@@ -260,9 +454,11 @@ dfdf['Five']=corFiveCol
 path = 'tl_2022_us_state/tl_2022_us_state.shp'
 newMap = gpd.read_file(path)
 
+
 #extracts the state and geometry columns since they are the only ones we need
 stateCol = pd.Series(newMap['NAME'])
 geometryCol = pd.Series(newMap['geometry'])
+
 
 
 #creating data frame for my new geopandas map
@@ -314,21 +510,9 @@ df['Four']=corFourCol
 df['Five']=corFiveCol
 
 
-
-
-
 #creating the final map
-thisMap = gpd.GeoDataFrame(df)
-print(thisMap)
-#thisMap.plot(figsize=(10,15))
 
-for i in range(0,5):
-    thisMap.plot(figsize=(10,15),column=f'{factors[i]}', legend=True)
-    plt.title(f"Demographic Index vs {eLabel[i]}")
-    
-    plt.savefig(f"heatMaps/USMaps/DemographicIndexVS{printLabel[i]}.png")
-    
+####ADD IN THE FUNCTIONS YOU WOULD LIKE TO RUN BELOW
 
 
 
-plt.show()
