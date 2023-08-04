@@ -21,7 +21,10 @@ def corrPlot(corrdf):#function to plot correlation heatmaps from a data frame th
     plt.title("Correlation of All Tracts")
     plt.show()
 
-def plotForState(stateName,stateIndex,colArr):#this will print a heatmap for a given state
+def plotTotalTract():
+    corrPlot(corrdf)
+
+def plotForState(stateName):#this will print a heatmap for a given state
     totalDataPoints = len(stateIndex[stateName])
     dataStart = stateIndex[stateName][0]
     print("DATA START",dataStart)
@@ -53,7 +56,7 @@ def plotForState(stateName,stateIndex,colArr):#this will print a heatmap for a g
     plt.show()
 
 
-def getCorrelationForState(stateName,stateIndex,colArr):#this will print a heatmap for a given state
+def getCorrelationForState(stateName,stateIndex,colArr):#this is used for another function DO NOT RUN
     totalDataPoints = len(stateIndex[stateName])
     dataStart = stateIndex[stateName][0]
     
@@ -97,8 +100,26 @@ def getCorrForAllTractsInState(stateName,stateIndex,colArr):
             newArr.append(currentFactor[i])
         newColArr.append(newArr)
 
+def graphFactors():
+    for i in range(0,13):#plots the relationship between all the different factors
+        print('i: ',i)
+        for j in range(13,20):
+            x = colArr[i]
+            y=colArr[j]
 
-def graphFactorsPerState(stateName,stateIndex,colArr):#graphs the correlation of factors for a given state
+            
+            plt.plot(x,y,'ro')
+            plt.xlabel(tableLabels[i])
+            plt.ylabel(tableLabels[j])
+            
+            
+            #plt.savefig(f"correlationGraphs/byState2/{stateName}.{tableLabels[i]}VS{tableLabels[j]}.png")
+            plt.show()
+
+
+
+
+def graphFactorsPerState(stateName):#graphs the correlation of factors for a given state
     totalDataPoints = len(stateIndex[stateName])    
     dataStart = stateIndex[stateName][0]
     dataEnd = stateIndex[stateName][totalDataPoints-1]
@@ -120,48 +141,27 @@ def graphFactorsPerState(stateName,stateIndex,colArr):#graphs the correlation of
             plt.savefig(f"correlationGraphs/byState2/{stateName}.{tableLabels[i]}VS{tableLabels[j]}.png")
             plt.show()
 
-def findMax(numOfMax,arr):#finds the max values in a data set and returns their index as well
-    finalMaxPrint = []
-    finalMaxIndexPrint = []
-   
-    manipulatedArr = arr
-    print(manipulatedArr)
-    for i in range(0,numOfMax):
-        totalItems = len(manipulatedArr)
-        currentMax=0
-        maxIndex = -1
-        for j in range(0,totalItems):
-            if currentMax<manipulatedArr[j]:
-                currentMax = manipulatedArr[j]
-                maxIndex = j
-                
-        finalMaxPrint.append(currentMax)
-        finalMaxIndexPrint.append(maxIndex)
-        manipulatedArr[maxIndex] = 0
 
-    print("FINAL MAX")
-    print(finalMaxPrint)
-    print(finalMaxIndexPrint)
 
-def graphAvgFactor(stateCol,geoCol,avgArr,index):#makes a US heatmap of the average of a given factor
+def graphAvgFactor(factorNum):#makes a US heatmap of the average of a given factor
 
     df = pd.DataFrame(columns = ['State','geometry','factoravg'])
     df['State'] = stateCol
-    df['geometry'] = geoCol
+    df['geometry'] = geometryCol
     df['factoravg'] = avgArr
 
     print(df)
     factorMap = gpd.GeoDataFrame(df)
     print(factorMap)
     factorMap.plot(figsize=(20,20),column='factoravg', legend=True,cmap = 'inferno')
-    plt.title(f"AVERAGE {printLabel[index]}")
+    plt.title(f"AVERAGE {printLabel[factorNum]}")
     
     plt.show()
 
 
 
 
-def graphSpecificState(path,givenState):
+def graphSpecificState(path,givenState):#will graph a specific state for you
     state = gpd.read_file(path)#this is the states shapefile
     
     
@@ -265,7 +265,7 @@ def graphSpecificState(path,givenState):
 
 
 df = pd.read_csv('RPCSV/CSVTables/totalTracts2.csv')#this is the file that holds all of the tracts
-print('hello')
+
 df=df.fillna(0)
 
 #these arrays hold the lists of factors
@@ -322,7 +322,7 @@ for label in tableLabels:#creates an array of all the factors and excludes the s
 
 newDf = pd.DataFrame(colArr)
 corrdf = newDf.transpose()#this is the data frame that has the factors as the columns so it is ready to do .corr() on 
-corrPlot(corrdf)
+#corrPlot(corrdf)
 
 
 
@@ -512,7 +512,20 @@ df['Five']=corFiveCol
 
 #creating the final map
 
-####ADD IN THE FUNCTIONS YOU WOULD LIKE TO RUN BELOW
+####UNCOMMENT THE FUNCTIONS YOU WOULD LIKE TO RUN BELOW###################
+
+
+
+#plotTotalTract()
+
+#plotForState('INSERT STATE NAME')
+
+graphFactorsPerState('Alabama')
+
+#graphAvgFactor(INSERT_FACTOR_NUMBER)
+
+
+############################################################################
 
 
 
